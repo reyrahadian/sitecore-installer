@@ -48,11 +48,11 @@ Copy-Item $sitecoreLicenseFilePath $dataFolderPath -Force
 
 #update Sitecore datafolder.config
 $datafolderConfigPath = $websiteFolderPath+"\app_config\include\datafolder.config.example"
-ThrowErrorIfPathIsInvalid($datafolderConfigPath)
-$dataFolderConfig = [xml](cat $datafolderConfigPath)
-$dataFolderConfig.configuration.sitecore.'sc.variable'.attribute.InnerText = $dataFolderPath
-$dataFolderConfig.Save($datafolderConfigPath)
-Rename-Item -NewName "DataFolder.config" -Path $datafolderConfigPath
+#ThrowErrorIfPathIsInvalid($datafolderConfigPath)
+#$dataFolderConfig = [xml](cat $datafolderConfigPath)
+#$dataFolderConfig.configuration.sitecore.'sc.variable'.attribute.InnerText = $dataFolderPath
+#$dataFolderConfig.Save($datafolderConfigPath)
+#Rename-Item -NewName "DataFolder.config" -Path $datafolderConfigPath
 
 
 #Register site in IIS
@@ -64,7 +64,15 @@ New-Website -Name $hostName -Port 80 -HostHeader $hostName -ApplicationPool $hos
 #Update host file
 Set-HostsEntry -IPAddress 127.0.0.1 -HostName $hostName
 
+#Modify db connection string
+$connectionStringFilePath = $websiteFolderPath+"\app_config\connectionstrings.config"
+ThrowErrorIfPathIsInvalid($connectionStringFilePath)
+$connectionStringConfig = [xml](cat $connectionStringFilePath)
+$connectionStringConfig.connectionStrings.InnerXml = $config.configuration.connectionStrings.InnerXml
+$connectionStringConfig.Save($connectionStringFilePath)
+
 #Attach database files
+
 #Sitecore hardening
 
 #Start website
